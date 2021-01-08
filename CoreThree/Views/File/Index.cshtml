@@ -1,0 +1,139 @@
+﻿@using CoreThree.Models
+@model List<FileModel>
+@{
+
+}
+
+<div class="container">
+    <div class="row">
+        <form class="form-inline">
+            <div class="form-group">
+                <label for="files">文件</label>
+                <input id="files" name="files" class="form-control" multiple="multiple" type="file" />
+            </div>
+            <button type="button" class="form-control btn btn-primary " style="padding-left:5px;padding-top:5px;" onclick="UploadStart()">上传</button>
+        </form>
+    </div>
+    <div class="row">
+        <table class="table col-md-10 offset-1">
+            <thead>
+                <tr>
+                    <th>文件名</th>
+                    <th>文件类型</th>
+                    <th>文件大小</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            @if (Model !=null && Model.Count>0 )
+            {
+                foreach (FileModel item in Model)
+                {
+                    <tr>
+                        <td>@item.FileName</td>
+                        <td>@item.FileType</td>
+                        <td>@Html.Raw(item.FileSize.ToString() + item.Unit)</td>
+                        <td>@item.CreateTime.ToString("yyyy-MM-dd")</td>
+                        <td><a asp-action="GetFile" asp-route-filePath="@item.FilePath">下载</a></td>
+                    </tr>
+                }
+            }
+
+        </table>
+    </div>
+</div>
+
+<div id="myModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">上传进度</h4>
+            </div>
+            <div class="modal-body" id="progressBody">
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+
+<script type="text/javascript">
+    $(function () {
+        $('#myModal').on('hidden.bs.modal', function (e) {
+            $("#progressBody").html("");
+        });
+    });
+//开始上传
+    function UploadStart() {
+        var files = $("#files")[0].files;
+        if (!!files && files.length > 0) {
+            for (var i = 0; i < files.length; i++) {
+                var html = ' <div class="row progress">"' + files[i].name.replace(' ', '') + '"</div><div class="progress" style="margin-top: 10px;"> <div id="' + BuidID(files[i].name) + '" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"> 0<span class="sr-only" id="span_val"></span></div></div>';
+                $("#progressBody").append(html);
+                AjaxFile(files[i], 0);
+            }
+            $('#myModal').modal("show");
+        } else {
+            layer.msg('请选择文件！');
+        }
+    }
+    function Clock(filename, int) {
+        $("#" + filename).css({ "width": int + "%" });
+        $("#" + filename).text(int + "%");
+    }
+
+    var UploadPath = "";
+    function AjaxFile(file, i) {
+        var name = file.name, //文件名
+            size = file.size, //总大小shardSize = 2 * 1024 * 1024,
+            shardSize = 2 * 1024 * 1024,//以2MB为一个分片
+            shardCount = Math.ceil(size / shardSize); //总片数
+        if (i >= shardCount) {
+            return;
+        }
+        //计算每一片的起始与结束位置
+        var start = i * shardSize,
+            end = Math.min(size, start + shardSize);
+        //构造一个表单，FormData是HTML5新增的
+        var form = new FormData();
+        form.append("data", file.slice(start, end)); //slice方法用于切出文件的一部分
+        form.append("lastModified", file.lastModified);
+        form.append("fileName", name);
+        form.append("total", shardCount); //总片数
+        form.append("index", i + 1); //当前是第几片
+        UploadPath = file.lastModified
+        //Ajax提交文件
+        $.ajax({
+            url: "@Url.Action("UploadFile")",
+            type: "POST",
+            data: form,
+            async: true, //异步
+            processData: false, //很重要，告诉jquery不要对form进行处理
+            contentType: false, //很重要，指定为false才能形成正确的Content-Type
+            success: function (result) {
+                if (result != null) {
+                    i = result.number++;
+                    var num = Math.ceil(i * 100 / shardCount);
+                    Clock(BuidID(file.name), num);//进度条
+                    AjaxFile(file, i);
+                    if (result.mergeOk) {
+                        layer.msg(file.name.replace(' ','') + '上传成功', {
+                            icon: 1,
+                            skin: 'layer-ext-moon', //该皮肤由layer.seaning.com友情扩展。关于皮肤的扩展规则，去这里查阅
+                        });
+                        var filepath = $("#files");
+                        filepath.after(filepath.clone().val(""));
+                        filepath.remove();//清空input file
+                    }
+                }
+            }
+        });
+    }
+
+    function BuidID(filename) {
+        return filename.substring(0, filename.lastIndexOf("."));
+    }
+</script>
+

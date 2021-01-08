@@ -1,0 +1,36 @@
+﻿
+@{
+}
+
+<div class="container">
+    <div class="row">
+        <form class="form-inline offset-1">
+            <div class="form-group">
+                <label for="name">查询类型</label>
+                <input type="text" class="form-control" id="name" placeholder="">
+            </div>
+            @*<div class="form-group">
+                <label for="age">年龄</label>
+                <input type="number" class="form-control" id="age" placeholder="">
+            </div>*@
+            <button type="submit" class="btn btn-default "><span class="glyphicon glyphicon-search"></span>  查询</button>
+        </form>
+
+        <a asp-action="AddUser" asp-controller="Home" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span>添加</a>&nbsp;&nbsp;
+        <a asp-action="Index" asp-controller="Department" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span>查看部门</a>
+    </div>
+    <div class="row" style="padding-top:10px;">
+        <table class="table col-md-10 offset-1">
+            <thead>
+                <tr>
+                    <th>姓名</th>
+                    <th>年龄</th>
+                    <th>住址</th>
+                    <th>性别</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+ 
+        </table>
+    </div>
+</div>

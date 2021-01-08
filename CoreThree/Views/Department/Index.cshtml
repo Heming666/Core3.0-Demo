@@ -1,0 +1,76 @@
+﻿@using DBModel.Models;
+@model IEnumerable<Department>
+@{
+
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>部门</title>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <form class="form-inline offset-1" asp-action="Index">
+                <div class="form-group">
+                    <label for="name">部门名称</label>
+                    <input type="text" class="form-control col-md-8" id="name" placeholder="">
+                </div>
+                <button type="submit" class="btn btn-default "><span class="glyphicon glyphicon-search"></span>  查询</button>
+            </form>
+            <a asp-action="AddDepart" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span>添加</a>&nbsp;&nbsp;
+            <a asp-action="Index" asp-controller="Home" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span>查看人员</a>
+        </div>
+        <div class="row">
+            <table class="table col-md-10 offset-1">
+                <thead>
+                    <tr>
+                        <th>部门名称</th>
+                        <th>部门所在地</th>
+                        <th>员工总数</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                @foreach (Department item in Model)
+                {
+                    <tr>
+                        <td>@item.DeptName</td>
+                        <td>@item.Location</td>
+                        <td>@item.EmployeeCount</td>
+                        <td><a href="javascript:void(0);" onclick="Del('@item.DeptId')">删除</a></td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+</body>
+<script type="text/javascript">
+    /**
+     * 删除
+     * @@param deptId {string} 部门Id
+     */
+    var Del = function (deptId) {
+        if (!!Del) {
+            $.ajax({
+                url: "@Url.Action("DelDept")",
+                type: "POST",
+                data: { deptId: deptId },
+                dataType:"json",
+                success: function (data) {
+                    layer.alert(data.Msg, { icon: 0 },function () {
+                        if (data.Code == 0) {
+                            location.href = location.href;
+                        }
+                    })
+                },
+                error: function (error) { console.log(error); layer.msg("请求失败"); }
+            });
+        } else {
+            layer.msg("未找到主键");
+        }
+    }
+</script>
+</html>

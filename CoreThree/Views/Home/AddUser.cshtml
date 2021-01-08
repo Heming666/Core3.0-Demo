@@ -1,0 +1,44 @@
+﻿
+@using DBModel.Models
+@using System.Linq;
+@model UserInfo
+@{
+    IEnumerable<Department> deptList = ViewBag.DeptList;
+    List<SelectListItem> selectList = new List<SelectListItem>();
+    foreach (var item in deptList)
+    {
+        selectList.Add(new SelectListItem(item.DeptName, item.DeptId.ToString()));
+    };
+}
+
+<form asp-controller="Home" asp-action="AddUser" class="col-md-4 offset-md-4" method="post">
+    <div class="form-group">
+        <input asp-for="Id" value="@Model.Id" type="hidden" />
+        <label asp-for="Name">部门名称</label>
+        <input asp-for="Name" class="form-control" placeholder="姓名" value="" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Address">住址</label>
+        <input asp-for="Address" class="form-control" placeholder="住址" value="" />
+        <span asp-validation-for="Address" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Age">住址</label>
+        <input asp-for="Age" class="form-control" type="number" placeholder="" value="" />
+        <span asp-validation-for="Age" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Sex">住址</label>
+        <select asp-for="Sex" class="selectpicker"><option value="0">男</option><option value="1">女</option></select>
+        <span asp-validation-for="Sex" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="DeptId">部门</label>
+        <select asp-for="DeptId" asp-items="selectList" class="selectpicker" data-live-search="true"></select>
+        <span asp-validation-for="DeptId" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">
+        <i class="glyphicon glyphicon-ok" aria-hidden="true"></i> 确认
+    </button>
+</form>
