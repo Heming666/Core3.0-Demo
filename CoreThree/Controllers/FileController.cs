@@ -9,15 +9,7 @@ using IService;
 using Microsoft.AspNetCore.StaticFiles;
 using System.Web;
 using Microsoft.AspNetCore.Http;
-using System.Net.Http.Headers;
-using Microsoft.Extensions.Logging;
 using NLog;
-using LogLevel = NLog.LogLevel;
-using NLog.MessageTemplates;
-using DBModel;
-using StackExchange.Redis;
-using Newtonsoft.Json;
-using Microsoft.VisualBasic;
 
 namespace CoreThree.Controllers
 {
@@ -27,7 +19,7 @@ namespace CoreThree.Controllers
         private readonly string _path;
         public FileController(IUserInfo userInfo, IDearptment dept)
         {
-            _path = "F:\\媒体";
+            _path = "F:\\迅雷下载";
             _logger = LogManager.GetCurrentClassLogger();
         }
         public IActionResult Index()
@@ -36,40 +28,6 @@ namespace CoreThree.Controllers
             List<FileModel> videoList;
             var filePaths = Directory.GetFiles(_path);
             videoList = GetAllVideo(filePaths);
-            #region redis
-            //var redislist = RedisClient.GetList<FileModel>("list");
-            //if (redislist.Result != null && redislist.Result.Count > 0)
-            //{
-            //    videoList = redislist.Result;
-
-            //} else
-            //{
-            //    var filePaths = Directory.GetFiles(_path);
-            //    videoList = GetAllVideo(filePaths);
-            //    RedisClient.SetList("list", videoList);
-            //}
-
-            //var hashList = RedisClient.HashGetAll<FileModel>("hash");
-            //if (hashList.Result != null && hashList.Result.Count > 0)
-            //{
-            //    videoList = redislist.Result;
-
-            //}
-            //else
-            //{
-            //    var filePaths = Directory.GetFiles(_path);
-            //    videoList = GetAllVideo(filePaths);
-            //    List<HashEntry> hashEntries = new List<HashEntry>();
-            //    if (videoList != null && videoList.Count > 0)
-            //    {
-            //        foreach (var item in videoList)
-            //        {
-            //            hashEntries.Add(new HashEntry(item.FileName, JsonConvert.SerializeObject(item)));
-            //        }
-            //        RedisClient.HashSet("hash", hashEntries.ToArray());
-            //    }
-            //}
-            #endregion
             return View(videoList);
         }
 
